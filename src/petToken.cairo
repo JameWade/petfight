@@ -11,6 +11,6 @@ mod petToken{
     fn constructor(ref self: ContractState,initial_supply:u256,recipient:ContractAddress) {
         let name = 'petToken';
         let symbol = 'PTK';
-
     }
+
 }
