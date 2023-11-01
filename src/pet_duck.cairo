@@ -1,6 +1,6 @@
 use array::ArrayTrait;
 use starknet::ContractAddress;
-#[derive(Component,Copy,Drop,Serde)]
+#[derive(Component,Copy,Drop,Serde,starknet::Store)]
 struct PetDuck{
     power:u8,
     blood: u8,
