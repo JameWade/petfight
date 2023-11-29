@@ -7,7 +7,8 @@ version = "0.1.0"
 [dependencies]
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.8.3" }
 starknet = "2.2.0"
-openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.7.0" }
+# openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.7.0" }
+# alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git" }
 [[target.starknet-contract]]
 casm = true
 # foo = { path = "vendor/foo" }
