@@ -3,7 +3,7 @@ use starknet::ContractAddress;
 trait IERC721<TContractState> {
     fn get_name(self: @TContractState) -> felt252;
     fn get_symbol(self: @TContractState) -> felt252;
-    fn token_uri(self: @TContractState, token_id: u256) -> felt252;
+    fn get_token_uri(self: @TContractState, token_id: u256) -> felt252;
     fn balance_of(self: @TContractState, account: ContractAddress) -> u256;
     fn is_approved_for_all(
         self: @TContractState, owner: ContractAddress, operator: ContractAddress
@@ -93,6 +93,10 @@ mod erc721 {
     impl ERC721Impl<
         TContractState, +HasComponent<TContractState>
     > of super::IERC721<ComponentState<TContractState>> {
+        fn get_token_uri(self: @ComponentState<TContractState>, token_id: u256) -> felt252 {
+            assert(self._exists(token_id), Errors::INVALID_TOKEN_ID);
+             self.token_uri.read(token_id)
+        }
         fn get_name(self: @ComponentState<TContractState>) -> felt252 {
             self.name.read()
         }
@@ -153,10 +157,6 @@ mod erc721 {
          fn get_approved(self: @ComponentState<TContractState>, token_id: u256) -> ContractAddress {
             assert(self._exists(token_id), Errors::INVALID_TOKEN_ID);
             self.token_approvals.read(token_id)
-        }
-        fn token_uri(self: @ComponentState<TContractState>, token_id: u256) -> felt252 {
-            assert(self._exists(token_id), Errors::INVALID_TOKEN_ID);
-             self.token_uri.read(token_id)
         }
          /// Query if `operator` is an authorized operator for `owner`.
         fn is_approved_for_all(
