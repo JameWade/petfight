@@ -49,7 +49,7 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
     impl OwnerShipHelper = ownable_comp::OwnableHelperImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl ERC20Impl = erc20_comp::IERC20<ContractState>;
+    impl ERC20Impl = erc20_comp::ERC20<ContractState>;
     impl ERC20Helper = erc20_comp::ERC20HelperImpl<ContractState>;
 
     #[abi(embed_v0)]

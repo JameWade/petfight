@@ -36,7 +36,7 @@ mod erc721 {
         name: felt252,
         symbol: felt252,
         owners: LegacyMap<u256, ContractAddress>,
-        balances: LegacyMap<ConContractAddresstr, u256>,
+        balances: LegacyMap<ContractAddress, u256>,
         token_approvals: LegacyMap<u256, ContractAddress>,
         operator_approvals: LegacyMap<(ContractAddress, ContractAddress), bool>,
         token_uri: LegacyMap<u256, felt252>,

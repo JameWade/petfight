@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 #[starknet::interface]
-trait ERC20Trait<TCS> {
+trait IERC20<TCS> {
     fn get_name(self: @TCS) -> felt252;
     fn get_symbol(self: @TCS) -> felt252;
     fn get_decimals(self: @TCS) -> u8;
@@ -48,10 +48,10 @@ mod erc20 {
         value: u256,
     }
 
-    #[embeddable_as(IERC20)]
+    #[embeddable_as(ERC20)]
     impl ERC20Impl<
         TContractState, +HasComponent<TContractState>
-    > of super::ERC20Trait<ComponentState<TContractState>> {
+    > of super::IERC20<ComponentState<TContractState>> {
         fn get_name(self: @ComponentState<TContractState>) -> felt252 {
             self.name.read()
         }
