@@ -23,7 +23,7 @@ use core::array::SpanTrait;
 
         //
         let player = dispatcher.get_players(caller_address);
-        PetDuckTrait::get_blood(player).print();
+        // PetDuckTrait::get_blood(player).print();
     }
     fn deploy_contract(name: felt252, owner: ContractAddress) ->ContractAddress{
         let contract = declare(name);
