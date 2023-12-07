@@ -1,11 +1,11 @@
-use petfight::pet_duck::PetDuck;
+use petfight::structs::pet_panda::petPanda;
 use starknet::ContractAddress;
 #[starknet::interface]
 trait IPet<TState> {
     fn register(ref self: TState);
     fn get_ranks(self: @TState) -> Span<felt252>;
     fn fight(ref self: TState, rival_address: ContractAddress);
-    fn get_players(self: @TState, addr: ContractAddress) -> PetDuck;
+    fn get_players(self: @TState, addr: ContractAddress) -> petPanda;
 }
 
 #[starknet::contract]
@@ -14,7 +14,7 @@ mod fight {
 use petfight::erc::erc20::erc20::ERC20HelperTrait;
     use petfight::ownerable::owner::TransferTrait;
     use array::{Span, ArrayTrait, SpanTrait, ArrayDrop, SpanSerde};
-    use petfight::pet_duck::{PetDuckTrait, PetDuck};
+    use petfight::structs::pet_panda::{PetPandaTrait, petPanda};
     use starknet::{ContractAddress, contract_address_to_felt252, get_caller_address};
     use petfight::utils::storage::StoreSpanFelt252;
     use petfight::ownerable::owner::owner as ownable_comp;
@@ -25,7 +25,7 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
     component!(path: mintable_comp, storage: mintable_storage, event: MintableEvent);
     #[storage]
     struct Storage {
-        player: LegacyMap::<ContractAddress, PetDuck>, //用户列表  address:rank
+        player: LegacyMap::<ContractAddress, petPanda>, //用户列表  address:rank
         ranks: Span<felt252>, //排名
         victor: ContractAddress,
         #[substorage(v0)]
@@ -77,7 +77,7 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
         }
         fn register(ref self: ContractState) {
             let caller: ContractAddress = get_caller_address();
-            let pet: PetDuck = PetDuckTrait::new();
+            let pet: petPanda = PetPandaTrait::new();
             self.player.write(caller, pet);
             let mut callers: Array<felt252> = ArrayTrait::new();
             callers.append(contract_address_to_felt252(caller));
@@ -87,7 +87,7 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
         fn get_ranks(self: @ContractState) -> Span<felt252> {
             return self.ranks.read();
         }
-        fn get_players(self: @ContractState, addr: ContractAddress) -> PetDuck {
+        fn get_players(self: @ContractState, addr: ContractAddress) -> petPanda {
             return self.player.read(addr);
         }
     }
