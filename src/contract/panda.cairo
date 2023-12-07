@@ -12,8 +12,6 @@ mod panda {
     #[storage]
     struct Storage {
         pet: petPanda,
-        #[substorage(v0)]
-        erc721_storage: erc721_comp::Storage,
     }
     #[derive(Drop, Copy, Serde, starknet::Store)]
     struct petPanda {
