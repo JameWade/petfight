@@ -27,7 +27,6 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
     struct Storage {
         player: LegacyMap::<ContractAddress, PetDuck>, //用户列表  address:rank
         ranks: Span<felt252>, //排名
-        victor: ContractAddress,
         #[substorage(v0)]
         ownable_storage: ownable_comp::Storage,
         #[substorage(v0)]

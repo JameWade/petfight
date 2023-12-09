@@ -9,13 +9,14 @@ trait swordTrait<TContractState> {
 #[starknet::component]
 mod sword {
     use petfight::erc::erc721::erc721::ERC721Trait;
-use starknet::ContractAddress;
+    use starknet::ContractAddress;
     use petfight::erc::erc721::erc721 as erc721_comp;
     #[storage]
     struct Storage {
         power:u16,
         mint_rank:u16     //达到16级才能铸造
         //todo add rank
+
     }
 
     #[embeddable_as(sword)]

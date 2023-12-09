@@ -1,9 +1,14 @@
 use core::{starknet::StorePacking, traits::{TryInto, Into}};
-#[derive(Copy, Drop, starknet::Store)]
+#[derive(Copy, Drop, Serde,starknet::Store)]
 struct Weapon{
      name:felt252,
      symbol:felt252,
      attack_power:u64,
+     rank:u8,   //等级
+}
+#[generate_trait]
+impl WeaponImpl of WeaponTrait {
+     fn update(){}
 }
 
 // impl ItemPrimitivePacking of StorePacking<Weapon, felt252> {

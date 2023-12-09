@@ -6,7 +6,8 @@ use super::{weapon::Weapon, skill::Skill};
 // use alexandria_storage::list::List;
 use petfight::utils::list::List;
 use petfight::utils::random::{Random};
-#[derive(Copy, Drop, starknet::Store)]
+use petfight::utils::storage_weapon::StoreWeaponArray;
+#[derive(Copy, Drop,starknet::Store)]
 struct petPanda {
     name: felt252,
     experience: u64,
@@ -17,6 +18,7 @@ struct petPanda {
     speed: u16,             //用于确定攻击顺序，以及每回合攻击次数
     weapons: List<Weapon>,
     skills: List<Skill>,
+    testWeapon:Array<Weapon>,
 }
 #[generate_trait]
 impl PetPandaImpl of PetPandaTrait {

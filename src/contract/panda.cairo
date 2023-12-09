@@ -1,3 +1,4 @@
+//deprate
 #[starknet::interface]
 trait IPanda<TCS> {
     fn new(ref self: TCS) -> panda::petPanda;
