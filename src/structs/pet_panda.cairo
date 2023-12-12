@@ -71,14 +71,14 @@ impl PetPandaImpl of PetPandaTrait {
         result
     }
     //entroy is attack count 
-    fn attack(entroy: u64, pet: petPanda) -> u64 {
+    fn attack(entroy: u64, pet: petPanda,weapons: Array<Weapon>,skills:Array<Skill>) -> u64 {
         //选择使用weapon or skill  also use get_random_start   todo change
         let use_what = PetPandaImpl::get_random_start(entroy); //true use weapon
         if use_what {
-            let weapon = PetPandaImpl::get_random_weapon(entroy, pet);
+            let weapon = PetPandaImpl::get_random_weapon(entroy, weapons);
             weapon.attack_power
         } else {
-            let skill = PetPandaImpl::get_random_skill(entroy, pet);
+            let skill = PetPandaImpl::get_random_skill(entroy, skills);
             skill.attack_power
         }
     }
@@ -93,18 +93,18 @@ impl PetPandaImpl of PetPandaTrait {
         }
     }
     #[inline(always)]
-    fn get_random_weapon(entroy: u64, pet: petPanda) -> Weapon {
+    fn get_random_weapon(entroy: u64, weapons: Array<Weapon>) -> Weapon {
         let rand: u128 = Random::random(entroy);
-        let weapon_num: u32 = pet.weapons.len(); //暂定最多设计20个武器
+        let weapon_num: u32 = weapons.len(); //暂定最多设计20个武器
         let choose: u32 = (rand % weapon_num.into()).try_into().unwrap();
-        *pet.weapons.get(choose).unwrap().unbox()
+        *weapons.get(choose).unwrap().unbox()
     }
 
     #[inline(always)]
-    fn get_random_skill(entroy: u64, pet: petPanda) -> Skill {
+    fn get_random_skill(entroy: u64, skills:Array<Skill>) -> Skill {
         let rand: u128 = Random::random(entroy);
-        let skill_num: u32 = pet.skills.len(); //暂定最多设计20个技能
+        let skill_num: u32 = skills.len(); //暂定最多设计20个技能
         let choose: u32 = (rand % skill_num.into()).try_into().unwrap();
-        *pet.skills.get(choose).unwrap().unbox()
+        *skills.get(choose).unwrap().unbox()
     }
 }

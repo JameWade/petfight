@@ -4,7 +4,7 @@ use starknet::ContractAddress;
 trait IPet<TState> {
     fn register(ref self: TState);
     fn get_ranks(self: @TState) -> Span<felt252>;
-    fn fight(ref self: TState, rival_address: ContractAddress);
+    fn fight(ref self: TState, rival_address: ContractAddress,petPandaERC721ContractAddress:ContractAddress);
     fn get_players(self: @TState, addr: ContractAddress) -> PetDuck;
 }
 
@@ -20,12 +20,14 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
     use petfight::ownerable::owner::owner as ownable_comp;
     use petfight::erc::erc20::erc20 as erc20_comp;
     use petfight::erc::mintable::mintable as mintable_comp;
+     use petfight::contract::pet721::{IPetPanda721Dispatcher,IPetPanda721DispatcherTrait};
     component!(path: ownable_comp, storage: ownable_storage, event: OwnableEvent);
     component!(path: erc20_comp, storage: erc20_storage, event: ERC20Event);
     component!(path: mintable_comp, storage: mintable_storage, event: MintableEvent);
     #[storage]
     struct Storage {
         player: LegacyMap::<ContractAddress, PetDuck>, //用户列表  address:rank
+        
         ranks: Span<felt252>, //排名
         #[substorage(v0)]
         ownable_storage: ownable_comp::Storage,
@@ -71,8 +73,9 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
 
     #[external(v0)]
     impl petImpl of super::IPet<ContractState> {
-        fn fight(ref self: ContractState, rival_address: ContractAddress) {
+        fn fight(ref self: ContractState, rival_address: ContractAddress,petPandaERC721ContractAddress:ContractAddress) {
             let caller: ContractAddress = get_caller_address();
+            IPetPanda721Dispatcher{petPandaERC721ContractAddress}.getPetPanda();
         }
         fn register(ref self: ContractState) {
             let caller: ContractAddress = get_caller_address();
