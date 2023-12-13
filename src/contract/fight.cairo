@@ -1,34 +1,39 @@
-use petfight::pet_duck::PetDuck;
+use petfight::structs::pet_panda::petPanda;
 use starknet::ContractAddress;
+///这个合约主要是用来计算一些体力值、武器打造、判断用户是否有权力继续比赛等
+//同时这个合约记录一份宠物经验作为用户排名   这个合约保存所有用户ContractAddress，从pet合约拿到对应宠物经验，在前端做排序
 #[starknet::interface]
 trait IPet<TState> {
-    fn register(ref self: TState);
-    fn get_ranks(self: @TState) -> Span<felt252>;
-    fn fight(ref self: TState, rival_address: ContractAddress,petPandaERC721ContractAddress:ContractAddress);
-    fn get_players(self: @TState, addr: ContractAddress) -> PetDuck;
+    fn register(ref self: TState,contract_address: ContractAddress);
+    fn get_players(self: @TState) -> Span<felt252>;
+    fn fight(ref self: TState, rival_address: ContractAddress, contract_address: ContractAddress);
+    fn get_ranks(self: @TState, addr: ContractAddress) -> petPanda;
 }
 
 #[starknet::contract]
 mod fight {
+    use core::traits::Into;
+use core::starknet::event::EventEmitter;
+    use petfight::contract::fight::IPet;
     use petfight::erc::mintable::MintTrait;
-use petfight::erc::erc20::erc20::ERC20HelperTrait;
+    use petfight::erc::erc20::erc20::ERC20HelperTrait;
     use petfight::ownerable::owner::TransferTrait;
     use array::{Span, ArrayTrait, SpanTrait, ArrayDrop, SpanSerde};
-    use petfight::pet_duck::{PetDuckTrait, PetDuck};
     use starknet::{ContractAddress, contract_address_to_felt252, get_caller_address};
     use petfight::utils::storage::StoreSpanFelt252;
     use petfight::ownerable::owner::owner as ownable_comp;
     use petfight::erc::erc20::erc20 as erc20_comp;
     use petfight::erc::mintable::mintable as mintable_comp;
-     use petfight::contract::pet721::{IPetPanda721Dispatcher,IPetPanda721DispatcherTrait};
+    use petfight::contract::pet721::{IPetPanda721Dispatcher, IPetPanda721DispatcherTrait};
+    use petfight::structs::pet_panda::{PetPandaTrait,petPanda};
+    use super::super::event::FightEvent;
     component!(path: ownable_comp, storage: ownable_storage, event: OwnableEvent);
     component!(path: erc20_comp, storage: erc20_storage, event: ERC20Event);
     component!(path: mintable_comp, storage: mintable_storage, event: MintableEvent);
     #[storage]
     struct Storage {
-        player: LegacyMap::<ContractAddress, PetDuck>, //用户列表  address:rank
-        
-        ranks: Span<felt252>, //排名
+        ranks: LegacyMap::<ContractAddress, petPanda>, //用户列表  address:rank
+        players: Span<felt252>, //排名
         #[substorage(v0)]
         ownable_storage: ownable_comp::Storage,
         #[substorage(v0)]
@@ -43,6 +48,7 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
         ERC20Event: erc20_comp::Event,
         OwnableEvent: ownable_comp::Event,
         MintableEvent: mintable_comp::Event,
+        Transfer: FightEvent,
     }
 
     #[abi(embed_v0)]
@@ -68,29 +74,35 @@ use petfight::erc::erc20::erc20::ERC20HelperTrait;
     ) {
         self.erc20_storage.init(name, symbol, decimals, initial_supply, recipient);
         self.ownable_storage.init_ownable(owner);
-        self.mintable_storage.mint(recipient,initial_supply);
+        self.mintable_storage.mint(recipient, initial_supply);
     }
 
     #[external(v0)]
     impl petImpl of super::IPet<ContractState> {
-        fn fight(ref self: ContractState, rival_address: ContractAddress,petPandaERC721ContractAddress:ContractAddress) {
+        fn fight(
+            ref self: ContractState,
+            rival_address: ContractAddress,
+            contract_address: ContractAddress
+        ) {
             let caller: ContractAddress = get_caller_address();
-            IPetPanda721Dispatcher{petPandaERC721ContractAddress}.getPetPanda();
+            let is_victory = IPetPanda721Dispatcher { contract_address }
+                .fight(caller, rival_address);
+            self.emit(FightEvent { from: caller, rival: rival_address, result: is_victory })
         }
-        fn register(ref self: ContractState) {
+
+        fn register(ref self: ContractState,contract_address: ContractAddress) {
             let caller: ContractAddress = get_caller_address();
-            let pet: PetDuck = PetDuckTrait::new();
-            self.player.write(caller, pet);
+            let pet: petPanda = IPetPanda721Dispatcher { contract_address }.mint(caller);
+            self.ranks.write(caller, pet);
             let mut callers: Array<felt252> = ArrayTrait::new();
-            callers.append(contract_address_to_felt252(caller));
-            let asd = callers.span();
-            self.ranks.write(asd);
+            callers.append(caller.into());
+            self.players.write(callers.span());
         }
-        fn get_ranks(self: @ContractState) -> Span<felt252> {
-            return self.ranks.read();
+        fn get_players(self: @ContractState) -> Span<felt252> {
+            return self.players.read();
         }
-        fn get_players(self: @ContractState, addr: ContractAddress) -> PetDuck {
-            return self.player.read(addr);
+        fn get_ranks(self: @ContractState, addr: ContractAddress) -> petPanda {
+            return self.ranks.read(addr);
         }
     }
 }

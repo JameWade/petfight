@@ -10,7 +10,7 @@ use petfight::utils::list::List;
 use petfight::utils::random::{Random};
 use petfight::utils::storage_weapon::StoreWeaponArray;
 use petfight::utils::storage_skill::StoreSkillArray;
-#[derive(Clone, Drop, Serde, starknet::Store)]
+#[derive(Copy, Drop, Serde, starknet::Store)]
 struct petPanda {
     name: felt252,
     experience: u64,
@@ -19,8 +19,6 @@ struct petPanda {
     power: u16,
     agility: u16,
     speed: u16, //用于确定攻击顺序，以及每回合攻击次数
-    weapons: Array<Weapon>,
-    skills: Array<Skill>,
 }
 #[generate_trait]
 impl PetPandaImpl of PetPandaTrait {
@@ -43,8 +41,6 @@ impl PetPandaImpl of PetPandaTrait {
             power: 1,
             agility: 1,
             speed: 1, //用于确定攻击顺序，以及每回合攻击次数
-            weapons: init_weapon,
-            skills: init_skill,
         }
     }
     //1、攻击开始方  随机
@@ -71,7 +67,7 @@ impl PetPandaImpl of PetPandaTrait {
         result
     }
     //entroy is attack count 
-    fn attack(entroy: u64, pet: petPanda,weapons: Array<Weapon>,skills:Array<Skill>) -> u64 {
+    fn attack(entroy: u64, pet: petPanda, weapons: Array<Weapon>, skills: Array<Skill>) -> u64 {
         //选择使用weapon or skill  also use get_random_start   todo change
         let use_what = PetPandaImpl::get_random_start(entroy); //true use weapon
         if use_what {
@@ -101,10 +97,29 @@ impl PetPandaImpl of PetPandaTrait {
     }
 
     #[inline(always)]
-    fn get_random_skill(entroy: u64, skills:Array<Skill>) -> Skill {
+    fn get_random_skill(entroy: u64, skills: Array<Skill>) -> Skill {
         let rand: u128 = Random::random(entroy);
         let skill_num: u32 = skills.len(); //暂定最多设计20个技能
         let choose: u32 = (rand % skill_num.into()).try_into().unwrap();
         *skills.get(choose).unwrap().unbox()
+    }
+
+    #[inline(always)]
+    fn increase_rank(
+        ref self: petPanda,
+        experience: u64,
+        rank: u16,
+        blood: u16,
+        power: u16,
+        agility: u16,
+        speed: u16
+    ) -> petPanda {
+        self.experience += experience;
+        self.rank += rank;
+        self.blood += blood;
+        self.power += power;
+        self.agility += agility;
+        self.speed += speed;
+        self
     }
 }

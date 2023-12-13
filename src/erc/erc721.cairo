@@ -35,8 +35,8 @@ mod erc721 {
     struct Storage {
         name: felt252,
         symbol: felt252,
-        owners: LegacyMap<u256, ContractAddress>,
-        balances: LegacyMap<ContractAddress, u256>,
+        owners: LegacyMap<u256, ContractAddress>,               //nft_id  ->  owner
+        balances: LegacyMap<ContractAddress, u256>,              //address ->nft_number
         token_approvals: LegacyMap<u256, ContractAddress>,
         operator_approvals: LegacyMap<(ContractAddress, ContractAddress), bool>,
         token_uri: LegacyMap<u256, felt252>,
