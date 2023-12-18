@@ -7,7 +7,8 @@ trait MintTrait<TContractState> {
 
 #[starknet::component]
 mod mintable {
-    use starknet::{ContractAddress, contract_address_const};
+    use zeroable::Zeroable;
+use starknet::{ContractAddress, contract_address_const};
     use petfight::ownerable::owner::owner as ownable_comp;
     use petfight::erc::erc20::erc20 as erc20_comp;
     use ownable_comp::OwnableHelperImpl;

@@ -1,4 +1,4 @@
-mod fight;
+mod game;
 mod sword;
 mod panda;
 mod weapon721;

@@ -3,7 +3,7 @@ use starknet::ContractAddress;
 ///这个合约主要是用来计算一些体力值、武器打造、判断用户是否有权力继续比赛等
 //同时这个合约记录一份宠物经验作为用户排名   这个合约保存所有用户ContractAddress，从pet合约拿到对应宠物经验，在前端做排序
 #[starknet::interface]
-trait IPet<TState> {
+trait IGame<TState> {
     fn register(ref self: TState,contract_address: ContractAddress);
     fn get_players(self: @TState) -> Span<felt252>;
     fn fight(ref self: TState, rival_address: ContractAddress, contract_address: ContractAddress);
@@ -11,10 +11,10 @@ trait IPet<TState> {
 }
 
 #[starknet::contract]
-mod fight {
+mod game {
     use core::traits::Into;
 use core::starknet::event::EventEmitter;
-    use petfight::contract::fight::IPet;
+    use petfight::contract::game::IGame;
     use petfight::erc::mintable::MintTrait;
     use petfight::erc::erc20::erc20::ERC20HelperTrait;
     use petfight::ownerable::owner::TransferTrait;
@@ -74,11 +74,11 @@ use core::starknet::event::EventEmitter;
     ) {
         self.erc20_storage.init(name, symbol, decimals, initial_supply, recipient);
         self.ownable_storage.init_ownable(owner);
-        self.mintable_storage.mint(recipient, initial_supply);
+        // self.mintable_storage.mint(recipient, initial_supply);
     }
 
     #[external(v0)]
-    impl petImpl of super::IPet<ContractState> {
+    impl petImpl of super::IGame<ContractState> {
         fn fight(
             ref self: ContractState,
             rival_address: ContractAddress,

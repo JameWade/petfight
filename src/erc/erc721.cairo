@@ -27,7 +27,7 @@ trait IERC721<TContractState> {
 
 #[starknet::component]
 mod erc721 {
-    use core::zeroable::Zeroable;
+    use zeroable::Zeroable;
     use petfight::erc::erc721::IERC721;
     use starknet::{ContractAddress, get_caller_address};
     use super::super::erc721_receiver::{ERC721Receiver, ERC721ReceiverTrait};

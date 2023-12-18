@@ -50,24 +50,34 @@ impl PetPandaImpl of PetPandaTrait {
     //loop
     //血量为0   over
     fn fight(self: @petPanda, pet: @petPanda) -> bool {
-        let self_blood = *self.blood;
-        let mate_blood = *pet.blood;
+        let mut self_blood = *self.blood;
+        let mut mate_blood = *pet.blood;
         let count = 0;
+        let mut damage =0;
         let result = loop {
-            if self_blood <= 0 {
-                false;
-            } else if mate_blood <= 0 {
-                true;
-            }
+            //每次循环需要计算轮到谁进行攻击
             let start = PetPandaImpl::get_random_start(count);
-            if start { //攻击
-            } else { //防守
+            if start { //自己攻击
+                damage = 12;
+                if self_blood>damage{
+                    self_blood -=damage;
+                }else{
+                    break false;
+                }
+            } else { 
+                //对手攻击
+                damage = 10;
+                if mate_blood>damage{
+                    mate_blood -=damage;
+                }else{
+                    break true;
+                }
             }
         };
         result
     }
     //entroy is attack count 
-    fn attack(entroy: u64, pet: petPanda, weapons: Array<Weapon>, skills: Array<Skill>) -> u64 {
+    fn compute_damage( pet: @petPanda,entroy: u64, weapons: Array<Weapon>, skills: Array<Skill>) -> u64 {
         //选择使用weapon or skill  also use get_random_start   todo change
         let use_what = PetPandaImpl::get_random_start(entroy); //true use weapon
         if use_what {
@@ -103,6 +113,7 @@ impl PetPandaImpl of PetPandaTrait {
         let choose: u32 = (rand % skill_num.into()).try_into().unwrap();
         *skills.get(choose).unwrap().unbox()
     }
+
 
     #[inline(always)]
     fn increase_rank(

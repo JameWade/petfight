@@ -18,7 +18,8 @@ trait IERC20<TCS> {
 
 #[starknet::component]
 mod erc20 {
-    use starknet::{ContractAddress, get_caller_address, contract_address_const};
+use zeroable::Zeroable;
+use starknet::{ContractAddress, get_caller_address, contract_address_const};
     #[storage]
     struct Storage {
         name: felt252,
