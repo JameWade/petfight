@@ -63,3 +63,4 @@ fn write_at_offset(
         255 * Store::<Skill>::size()
     }
 }
+

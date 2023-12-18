@@ -107,4 +107,5 @@ impl PetPandaImpl of PetPandaTrait {
         let choose: u32 = (rand % skill_num.into()).try_into().unwrap();
         *pet.skills.get(choose).unwrap().unbox()
     }
+
 }
