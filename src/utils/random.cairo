@@ -11,4 +11,6 @@ impl Random of RandomTrait {
         let x: u128 = (rolling_hash.low);
         x
     }
+
+    
 }

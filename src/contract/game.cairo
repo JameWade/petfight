@@ -6,7 +6,7 @@ use starknet::ContractAddress;
 trait IGame<TState> {
     fn register(ref self: TState,contract_address: ContractAddress);
     fn get_players(self: @TState) -> Span<felt252>;
-    fn fight(ref self: TState, rival_address: ContractAddress, contract_address: ContractAddress);
+    fn fight(ref self: TState, rival_address: ContractAddress, contract_address: ContractAddress,contract_address2:ContractAddress,);
     fn get_ranks(self: @TState, addr: ContractAddress) -> petPanda;
 }
 
@@ -25,6 +25,7 @@ use core::starknet::event::EventEmitter;
     use petfight::erc::erc20::erc20 as erc20_comp;
     use petfight::erc::mintable::mintable as mintable_comp;
     use petfight::contract::pet721::{IPetPanda721Dispatcher, IPetPanda721DispatcherTrait};
+    use petfight::contract::weapon721::{IWeapon721Dispatcher,IWeapon721DispatcherTrait};
     use petfight::structs::pet_panda::{PetPandaTrait,petPanda};
     use super::super::event::FightEvent;
     component!(path: ownable_comp, storage: ownable_storage, event: OwnableEvent);
@@ -34,6 +35,7 @@ use core::starknet::event::EventEmitter;
     struct Storage {
         ranks: LegacyMap::<ContractAddress, petPanda>, //用户列表  address:rank
         players: Span<felt252>, //排名
+        // game_owner:ContractAddress,
         #[substorage(v0)]
         ownable_storage: ownable_comp::Storage,
         #[substorage(v0)]
@@ -82,11 +84,26 @@ use core::starknet::event::EventEmitter;
         fn fight(
             ref self: ContractState,
             rival_address: ContractAddress,
-            contract_address: ContractAddress
+            contract_address: ContractAddress,
+            contract_address2:ContractAddress,
         ) {
             let caller: ContractAddress = get_caller_address();
-            let is_victory = IPetPanda721Dispatcher { contract_address }
-                .fight(caller, rival_address);
+            let pet721_dispatcher = IPetPanda721Dispatcher{contract_address};
+            let weapon_dispatcher = IWeapon721Dispatcher{contract_address:contract_address2};
+            let mut self_panda = pet721_dispatcher.getPetPanda(caller);
+            let mut rival_panda = pet721_dispatcher.getPetPanda(rival_address);
+            let is_victory = self_panda.fight(@rival_panda);
+            if is_victory {
+                //todo 修改经验
+                self_panda.increase_rank(1, 1, 1, 1, 1, 1);
+                rival_panda.increase_rank(0, 0, 0, 0, 0, 0);
+            } else {
+                self_panda.increase_rank(1, 1, 1, 1, 1, 1);
+                rival_panda.increase_rank(0, 0, 0, 0, 0, 0);
+            }
+            //更新宠物信息
+            pet721_dispatcher.updatePet(caller,self_panda);
+            pet721_dispatcher.updatePet(rival_address,rival_panda);
             self.emit(FightEvent { from: caller, rival: rival_address, result: is_victory })
         }
 

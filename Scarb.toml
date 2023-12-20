@@ -14,3 +14,7 @@ alexandria_storage = { git = "https://github.com/keep-starknet-strange/alexandri
 sierra = true
 casm = true
 # foo = { path = "vendor/foo" }
+[tool.sncast.myprofile]
+account = "user"
+accounts-file = "~/.starkli-wallets/deployer/account0_account.json"
+url = "http://127.0.0.1:5050/rpc"

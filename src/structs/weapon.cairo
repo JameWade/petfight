@@ -1,6 +1,6 @@
 use core::{starknet::StorePacking, traits::{TryInto, Into}};
 #[derive(Copy, Drop, Serde, starknet::Store)]
-struct Weapon {
+struct weapon {
     name: felt252,
     symbol: felt252,
     attack_power: u64,
@@ -9,8 +9,8 @@ struct Weapon {
 #[generate_trait]
 impl WeaponImpl of WeaponTrait {
     fn update() {}
-    fn new(name:felt252,symbol:felt252) -> Weapon {
-        Weapon { name: name, symbol: symbol, attack_power: 10, rank: 1, //等级
+    fn new(name:felt252,symbol:felt252) -> weapon {
+        weapon { name: name, symbol: symbol, attack_power: 10, rank: 1, //等级
          }
     }
 }

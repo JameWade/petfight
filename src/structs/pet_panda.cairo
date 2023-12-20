@@ -1,14 +1,14 @@
+use core::clone::Clone;
 use core::box::BoxTrait;
 use core::array::ArrayTrait;
 use petfight::utils::list::ListTrait;
 use core::option::OptionTrait;
 use core::traits::TryInto;
 use core::traits::Into;
-use super::{weapon::Weapon, weapon::WeaponImpl, skill::Skill, skill::SkillImpl};
+use super::{weapon::weapon, weapon::WeaponImpl, skill::Skill, skill::SkillImpl};
 // use alexandria_storage::list::List;
 use petfight::utils::list::List;
 use petfight::utils::random::{Random};
-use petfight::utils::storage_weapon::StoreWeaponArray;
 use petfight::utils::storage_skill::StoreSkillArray;
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct petPanda {
@@ -23,7 +23,7 @@ struct petPanda {
 #[generate_trait]
 impl PetPandaImpl of PetPandaTrait {
     fn new(name: felt252) -> petPanda {
-        let mut init_weapon: Array<Weapon> = ArrayTrait::new();
+        let mut init_weapon: Array<weapon> = ArrayTrait::new();
         let weapon1 = WeaponImpl::new('dao', 'dao');
         let weapon2 = WeaponImpl::new('qiang', 'qiang');
         init_weapon.append(weapon1);
@@ -77,7 +77,7 @@ impl PetPandaImpl of PetPandaTrait {
         result
     }
     //entroy is attack count 
-    fn compute_damage( pet: @petPanda,entroy: u64, weapons: Array<Weapon>, skills: Array<Skill>) -> u64 {
+    fn compute_damage( pet: @petPanda,entroy: u64, weapons: Array<weapon>, skills: Array<Skill>) -> u64 {
         //选择使用weapon or skill  also use get_random_start   todo change
         let use_what = PetPandaImpl::get_random_start(entroy); //true use weapon
         if use_what {
@@ -99,7 +99,7 @@ impl PetPandaImpl of PetPandaTrait {
         }
     }
     #[inline(always)]
-    fn get_random_weapon(entroy: u64, weapons: Array<Weapon>) -> Weapon {
+    fn get_random_weapon(entroy: u64, weapons: Array<weapon>) -> weapon {
         let rand: u128 = Random::random(entroy);
         let weapon_num: u32 = weapons.len(); //暂定最多设计20个武器
         let choose: u32 = (rand % weapon_num.into()).try_into().unwrap();
