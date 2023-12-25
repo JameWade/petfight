@@ -15,6 +15,6 @@ sierra = true
 casm = true
 # foo = { path = "vendor/foo" }
 [tool.sncast.myprofile]
-account = "user"
-accounts-file = "~/.starkli-wallets/deployer/account0_account.json"
-url = "http://127.0.0.1:5050/rpc"
+account  = "~/.starkli-wallets/deployer/account0_account.json"
+keystore =  "~/.starkli-wallets/deployer/account0_keystore.json"
+url = "http://127.0.0.1:5050"
