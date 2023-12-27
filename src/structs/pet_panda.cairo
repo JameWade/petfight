@@ -1,3 +1,4 @@
+use core::debug::PrintTrait;
 use core::clone::Clone;
 use core::box::BoxTrait;
 use core::array::ArrayTrait;
@@ -53,23 +54,23 @@ impl PetPandaImpl of PetPandaTrait {
         let mut self_blood = *self.blood;
         let mut mate_blood = *pet.blood;
         let count = 0;
-        let mut damage =0;
+        let mut damage = 0;
         let result = loop {
             //每次循环需要计算轮到谁进行攻击
             let start = PetPandaImpl::get_random_start(count);
             if start { //自己攻击
                 damage = 12;
-                if self_blood>damage{
-                    self_blood -=damage;
-                }else{
+                if self_blood > damage {
+                    self_blood -= damage;
+                } else {
                     break false;
                 }
-            } else { 
+            } else {
                 //对手攻击
                 damage = 10;
-                if mate_blood>damage{
-                    mate_blood -=damage;
-                }else{
+                if mate_blood > damage {
+                    mate_blood -= damage;
+                } else {
                     break true;
                 }
             }
@@ -77,7 +78,9 @@ impl PetPandaImpl of PetPandaTrait {
         result
     }
     //entroy is attack count 
-    fn compute_damage( pet: @petPanda,entroy: u64, weapons: Array<weapon>, skills: Array<Skill>) -> u64 {
+    fn compute_damage(
+        pet: @petPanda, entroy: u64, weapons: Array<weapon>, skills: Array<Skill>
+    ) -> u64 {
         //选择使用weapon or skill  also use get_random_start   todo change
         let use_what = PetPandaImpl::get_random_start(entroy); //true use weapon
         if use_what {
@@ -132,5 +135,16 @@ impl PetPandaImpl of PetPandaTrait {
         self.agility += agility;
         self.speed += speed;
         self
+    }
+}
+impl PetPandaPrint of PrintTrait<petPanda> {
+    fn print(self: petPanda) {
+        self.agility.print();
+        self.blood.print();
+        self.name.print();
+        self.experience.print();
+        self.rank.print();
+        self.power.print();
+        self.speed.print();
     }
 }
