@@ -8,11 +8,14 @@ trait IGame<TState> {
     fn get_players(self: @TState) -> Span<felt252>;
     fn fight(ref self: TState, rival_address: ContractAddress, contract_address: ContractAddress,contract_address2:ContractAddress,);
     fn get_ranks(self: @TState, addr: ContractAddress) -> petPanda;
+    fn update_weapon_list(ref self: TState,name :felt252,contract_address:ContractAddress);
+    fn update_skill_list( ref self:TState,name :felt252,contract_address:ContractAddress);
 }
 
 #[starknet::contract]
 mod game {
-    use core::traits::Into;
+    use petfight::ownerable::owner::owner::OwnableHelperTrait;
+use core::traits::Into;
 use core::starknet::event::EventEmitter;
     use petfight::contract::game::IGame;
     use petfight::erc::mintable::MintTrait;
@@ -31,10 +34,13 @@ use core::starknet::event::EventEmitter;
     component!(path: ownable_comp, storage: ownable_storage, event: OwnableEvent);
     component!(path: erc20_comp, storage: erc20_storage, event: ERC20Event);
     component!(path: mintable_comp, storage: mintable_storage, event: MintableEvent);
+    //todo 存储优化
     #[storage]
     struct Storage {
         ranks: LegacyMap::<ContractAddress, petPanda>, //用户列表  address:rank
         players: Span<felt252>, //排名
+        weaponList:LegacyMap::<felt252,ContractAddress>,
+        skillList:LegacyMap::<felt252,ContractAddress>,
         // game_owner:ContractAddress,
         #[substorage(v0)]
         ownable_storage: ownable_comp::Storage,
@@ -95,11 +101,11 @@ use core::starknet::event::EventEmitter;
             let is_victory = self_panda.fight(@rival_panda);
             if is_victory {
                 //todo 修改经验
-                self_panda.increase_rank(1, 1, 1, 1, 1, 1);
-                rival_panda.increase_rank(0, 0, 0, 0, 0, 0);
+                self_panda.increase_level(1, 1, 1, 1, 1, 1);
+                rival_panda.increase_level(0, 0, 0, 0, 0, 0);
             } else {
-                self_panda.increase_rank(1, 1, 1, 1, 1, 1);
-                rival_panda.increase_rank(0, 0, 0, 0, 0, 0);
+                self_panda.increase_level(1, 1, 1, 1, 1, 1);
+                rival_panda.increase_level(0, 0, 0, 0, 0, 0);
             }
             //更新宠物信息
             pet721_dispatcher.updatePet(caller,self_panda);
@@ -121,6 +127,16 @@ use core::starknet::event::EventEmitter;
         fn get_ranks(self: @ContractState, addr: ContractAddress) -> petPanda {
             return self.ranks.read(addr);
         }
+        fn update_weapon_list(ref self: ContractState,name :felt252,contract_address:ContractAddress){
+             self.ownable_storage.validate_ownership();
+            self.weaponList.write(name,contract_address);
+        }
+        fn update_skill_list(ref self:ContractState,name :felt252,contract_address:ContractAddress){
+            self.ownable_storage.validate_ownership();
+
+        }
+        
     }
+
 }
 

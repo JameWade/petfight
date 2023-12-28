@@ -11,11 +11,12 @@ use super::{weapon::weapon, weapon::WeaponImpl, skill::Skill, skill::SkillImpl};
 use petfight::utils::list::List;
 use petfight::utils::random::{Random};
 use petfight::utils::storage_skill::StoreSkillArray;
+use petfight::structs::fight::FightImpl;
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct petPanda {
     name: felt252,
-    experience: u64,
-    rank: u16,
+    xp: u64,
+    level: u16,
     blood: u16,
     power: u16,
     agility: u16,
@@ -36,8 +37,8 @@ impl PetPandaImpl of PetPandaTrait {
         init_skill.append(skill2);
         petPanda {
             name: name,
-            experience: 0,
-            rank: 1,
+            xp: 0,
+            level: 1,
             blood: 100,
             power: 1,
             agility: 1,
@@ -57,7 +58,7 @@ impl PetPandaImpl of PetPandaTrait {
         let mut damage = 0;
         let result = loop {
             //每次循环需要计算轮到谁进行攻击
-            let start = PetPandaImpl::get_random_start(count);
+            let start = FightImpl::get_random_start(count);
             if start { //自己攻击
                 damage = 12;
                 if self_blood > damage {
@@ -77,64 +78,36 @@ impl PetPandaImpl of PetPandaTrait {
         };
         result
     }
-    //entroy is attack count 
-    fn compute_damage(
-        pet: @petPanda, entroy: u64, weapons: Array<weapon>, skills: Array<Skill>
-    ) -> u64 {
-        //选择使用weapon or skill  also use get_random_start   todo change
-        let use_what = PetPandaImpl::get_random_start(entroy); //true use weapon
-        if use_what {
-            let weapon = PetPandaImpl::get_random_weapon(entroy, weapons);
-            weapon.attack_power
-        } else {
-            let skill = PetPandaImpl::get_random_skill(entroy, skills);
-            skill.attack_power
-        }
-    }
-    #[inline(always)]
-    fn get_random_start(entroy: u64) -> bool {
-        let rand = Random::random(entroy);
-        let bit = rand % 2;
-        if bit == 1 {
-            true
-        } else {
-            false
-        }
-    }
-    #[inline(always)]
-    fn get_random_weapon(entroy: u64, weapons: Array<weapon>) -> weapon {
-        let rand: u128 = Random::random(entroy);
-        let weapon_num: u32 = weapons.len(); //暂定最多设计20个武器
-        let choose: u32 = (rand % weapon_num.into()).try_into().unwrap();
-        *weapons.get(choose).unwrap().unbox()
-    }
 
-    #[inline(always)]
-    fn get_random_skill(entroy: u64, skills: Array<Skill>) -> Skill {
-        let rand: u128 = Random::random(entroy);
-        let skill_num: u32 = skills.len(); //暂定最多设计20个技能
-        let choose: u32 = (rand % skill_num.into()).try_into().unwrap();
-        *skills.get(choose).unwrap().unbox()
-    }
+
 
 
     #[inline(always)]
-    fn increase_rank(
+    fn increase_level(
         ref self: petPanda,
-        experience: u64,
-        rank: u16,
+        xp: u64,
+        level: u16,
         blood: u16,
         power: u16,
         agility: u16,
         speed: u16
     ) -> petPanda {
-        self.experience += experience;
-        self.rank += rank;
+        self.xp += xp;
+        self.level += level;
         self.blood += blood;
         self.power += power;
         self.agility += agility;
         self.speed += speed;
         self
+    }
+    // 负责经验数值更新
+    #[inline(always)]
+    fn increase_xp(self:petPanda){
+        if self.level>0 && self.level<=10{
+
+        }else if self.level>10&& self.level<20{
+
+        }
     }
 }
 impl PetPandaPrint of PrintTrait<petPanda> {
@@ -142,8 +115,8 @@ impl PetPandaPrint of PrintTrait<petPanda> {
         self.agility.print();
         self.blood.print();
         self.name.print();
-        self.experience.print();
-        self.rank.print();
+        self.xp.print();
+        self.level.print();
         self.power.print();
         self.speed.print();
     }
