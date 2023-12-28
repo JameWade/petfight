@@ -6,7 +6,7 @@ impl FightImpl of IFight{
         //entroy is attack count 
     fn compute_damage(
         pet: @petPanda, entroy: u64, weapons: Array<weapon>, skills: Array<Skill>
-    ) -> u64 {
+    ) -> u16 {
         //选择使用weapon or skill  also use get_random_start   todo change
         let use_what = FightImpl::get_random_start(entroy); //true use weapon
         if use_what {

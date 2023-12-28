@@ -3,7 +3,7 @@ use core::{starknet::StorePacking, traits::{TryInto, Into}};
 struct Skill{
      name:felt252,
      symbol:felt252,
-     attack_power:u64,
+     attack_power:u16,
      rank:u64,
 }
 #[generate_trait]

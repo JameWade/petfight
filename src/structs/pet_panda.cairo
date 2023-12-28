@@ -51,16 +51,16 @@ impl PetPandaImpl of PetPandaTrait {
     //4、计算伤害
     //loop
     //血量为0   over
-    fn fight(self: @petPanda, pet: @petPanda) -> bool {
+    fn fight(self: @petPanda, pet: @petPanda,self_weapons: Array<weapon>, self_skills: Array<Skill>,mate_weapons: Array<weapon>, mate_skills: Array<Skill>) -> bool {
         let mut self_blood = *self.blood;
         let mut mate_blood = *pet.blood;
         let count = 0;
-        let mut damage = 0;
+        let mut damage:u16 = 0;
         let result = loop {
             //每次循环需要计算轮到谁进行攻击
             let start = FightImpl::get_random_start(count);
             if start { //自己攻击
-                damage = 12;
+                damage = FightImpl::compute_damage( pet, count, self_weapons, self_skills);
                 if self_blood > damage {
                     self_blood -= damage;
                 } else {

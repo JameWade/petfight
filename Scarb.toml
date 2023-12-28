@@ -10,9 +10,7 @@ starknet = "2.3.0"
 # openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.7.0" }
 # alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", tag = "cairo-v2.3.0-rc0"}
 alexandria_storage = { git = "https://github.com/keep-starknet-strange/alexandria.git", tag = "cairo-v2.3.0-rc0"}
-[[target.starknet-contract]]
-sierra = true
-casm = true
+
 # foo = { path = "vendor/foo" }
 [tool.sncast.myprofile]
 account  = "~/.starkli-wallets/deployer/account0_account.json"

@@ -3,7 +3,7 @@ use core::{starknet::StorePacking, traits::{TryInto, Into}};
 struct weapon {
     name: felt252,
     symbol: felt252,
-    attack_power: u64,
+    attack_power: u16,
     rank: u8, //等级
 }
 #[generate_trait]

@@ -4,19 +4,24 @@ use starknet::ContractAddress;
 //同时这个合约记录一份宠物经验作为用户排名   这个合约保存所有用户ContractAddress，从pet合约拿到对应宠物经验，在前端做排序
 #[starknet::interface]
 trait IGame<TState> {
-    fn register(ref self: TState,contract_address: ContractAddress);
+    fn register(ref self: TState, contract_address: ContractAddress);
     fn get_players(self: @TState) -> Span<felt252>;
-    fn fight(ref self: TState, rival_address: ContractAddress, contract_address: ContractAddress,contract_address2:ContractAddress,);
+    fn fight(
+        ref self: TState,
+        rival_address: ContractAddress,
+        contract_address: ContractAddress,
+        contract_address2: ContractAddress,
+    );
     fn get_ranks(self: @TState, addr: ContractAddress) -> petPanda;
-    fn update_weapon_list(ref self: TState,name :felt252,contract_address:ContractAddress);
-    fn update_skill_list( ref self:TState,name :felt252,contract_address:ContractAddress);
+    fn update_weapon_list(ref self: TState, name: felt252, contract_address: ContractAddress);
+    fn update_skill_list(ref self: TState, name: felt252, contract_address: ContractAddress);
 }
 
 #[starknet::contract]
 mod game {
     use petfight::ownerable::owner::owner::OwnableHelperTrait;
-use core::traits::Into;
-use core::starknet::event::EventEmitter;
+    use core::traits::Into;
+    use core::starknet::event::EventEmitter;
     use petfight::contract::game::IGame;
     use petfight::erc::mintable::MintTrait;
     use petfight::erc::erc20::erc20::ERC20HelperTrait;
@@ -28,8 +33,8 @@ use core::starknet::event::EventEmitter;
     use petfight::erc::erc20::erc20 as erc20_comp;
     use petfight::erc::mintable::mintable as mintable_comp;
     use petfight::contract::pet721::{IPetPanda721Dispatcher, IPetPanda721DispatcherTrait};
-    use petfight::contract::weapon721::{IWeapon721Dispatcher,IWeapon721DispatcherTrait};
-    use petfight::structs::pet_panda::{PetPandaTrait,petPanda};
+    use petfight::contract::weapon721::{IWeapon721Dispatcher, IWeapon721DispatcherTrait};
+    use petfight::structs::pet_panda::{PetPandaTrait, petPanda};
     use super::super::event::FightEvent;
     component!(path: ownable_comp, storage: ownable_storage, event: OwnableEvent);
     component!(path: erc20_comp, storage: erc20_storage, event: ERC20Event);
@@ -39,8 +44,8 @@ use core::starknet::event::EventEmitter;
     struct Storage {
         ranks: LegacyMap::<ContractAddress, petPanda>, //用户列表  address:rank
         players: Span<felt252>, //排名
-        weaponList:LegacyMap::<felt252,ContractAddress>,
-        skillList:LegacyMap::<felt252,ContractAddress>,
+        weaponList: LegacyMap::<felt252, ContractAddress>,
+        skillList: LegacyMap::<felt252, ContractAddress>,
         // game_owner:ContractAddress,
         #[substorage(v0)]
         ownable_storage: ownable_comp::Storage,
@@ -82,7 +87,7 @@ use core::starknet::event::EventEmitter;
     ) {
         self.erc20_storage.init(name, symbol, decimals, initial_supply, recipient);
         self.ownable_storage.init_ownable(owner);
-        // self.mintable_storage.mint(recipient, initial_supply);
+    // self.mintable_storage.mint(recipient, initial_supply);
     }
 
     #[external(v0)]
@@ -91,11 +96,11 @@ use core::starknet::event::EventEmitter;
             ref self: ContractState,
             rival_address: ContractAddress,
             contract_address: ContractAddress,
-            contract_address2:ContractAddress,
+            contract_address2: ContractAddress,
         ) {
             let caller: ContractAddress = get_caller_address();
-            let pet721_dispatcher = IPetPanda721Dispatcher{contract_address};
-            let weapon_dispatcher = IWeapon721Dispatcher{contract_address:contract_address2};
+            let pet721_dispatcher = IPetPanda721Dispatcher { contract_address };
+            let weapon_dispatcher = IWeapon721Dispatcher { contract_address: contract_address2 };
             let mut self_panda = pet721_dispatcher.getPetPanda(caller);
             let mut rival_panda = pet721_dispatcher.getPetPanda(rival_address);
             let is_victory = self_panda.fight(@rival_panda);
@@ -108,12 +113,12 @@ use core::starknet::event::EventEmitter;
                 rival_panda.increase_level(0, 0, 0, 0, 0, 0);
             }
             //更新宠物信息
-            pet721_dispatcher.updatePet(caller,self_panda);
-            pet721_dispatcher.updatePet(rival_address,rival_panda);
+            pet721_dispatcher.updatePet(caller, self_panda);
+            pet721_dispatcher.updatePet(rival_address, rival_panda);
             self.emit(FightEvent { from: caller, rival: rival_address, result: is_victory })
         }
 
-        fn register(ref self: ContractState,contract_address: ContractAddress) {
+        fn register(ref self: ContractState, contract_address: ContractAddress) {
             let caller: ContractAddress = get_caller_address();
             let pet: petPanda = IPetPanda721Dispatcher { contract_address }.mint(caller);
             self.ranks.write(caller, pet);
@@ -127,16 +132,18 @@ use core::starknet::event::EventEmitter;
         fn get_ranks(self: @ContractState, addr: ContractAddress) -> petPanda {
             return self.ranks.read(addr);
         }
-        fn update_weapon_list(ref self: ContractState,name :felt252,contract_address:ContractAddress){
-             self.ownable_storage.validate_ownership();
-            self.weaponList.write(name,contract_address);
-        }
-        fn update_skill_list(ref self:ContractState,name :felt252,contract_address:ContractAddress){
+        fn update_weapon_list(
+            ref self: ContractState, name: felt252, contract_address: ContractAddress
+        ) {
             self.ownable_storage.validate_ownership();
-
+            self.weaponList.write(name, contract_address);
         }
-        
+        fn update_skill_list(
+            ref self: ContractState, name: felt252, contract_address: ContractAddress
+        ) {
+            self.ownable_storage.validate_ownership();
+            self.skillList.write(name,contract_address);
+        }
     }
-
 }
 
